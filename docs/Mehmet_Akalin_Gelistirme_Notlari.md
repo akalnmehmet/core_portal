@@ -35,4 +35,4 @@ dotnet run --project src/CorePortal.Web/CorePortal.Web.csproj
 
 ## Entegrasyon notları
 
-Tarık'ın sorumluluğundaki vitrin, duyuru CRUD, başvuru onay/red, profil, filtreleme ve son README düzenlemesi bu temelin üzerine eklenebilir. Veri tabloları ve ilişkileri hazırdır. Proje klasöründe başlangıçta yalnızca plan belgesi vardı; GitHub deposunda kod olup olmadığı ayrıca doğrulanmalıdır. Bu çalışma sırasında kaynak kodu uzak depoya gönderilmedi.
+Tarık'ın sorumluluğundaki vitrin, duyuru CRUD, başvuru onay/red, profil, filtreleme ve son README düzenlemesi bu temelin üzerine eklenebilir. Veri tabloları ve ilişkileri hazırdır. Proje klasöründe başlangıçta yalnızca plan belgesi vardı; oluşturulan kaynak kodu plan belgesindeki GitHub deposunun `main` dalına gönderildi.
