@@ -2,6 +2,8 @@
 
 Plan belgesinde Mehmet Akalın'a verilen yazılım işlerinin bu klasördeki karşılığı aşağıdadır. Proje .NET 10, ASP.NET Core MVC, EF Core ve PostgreSQL kullanır.
 
+Ayrıntılı teknik dokümanlar: [Faz 1 Altyapı Veritabanı ve Kimlik](Faz_1_Altyapi_Veritabani_Kimlik_Teknik_Dokuman.md), [Faz 2 MVC Başvurular ve Yönetim](Faz_2_MVC_Basvurular_Yonetim_Teknik_Dokuman.md), [Faz 3 API GitHub ve Doğrulama](Faz_3_API_GitHub_Dogrulama_Teknik_Dokuman.md).
+
 | Hafta | Sorumluluk | Kod karşılığı |
 | --- | --- | --- |
 | 1 | Mimari ve veritabanı bağlantısı | `src/CorePortal.Web`, `ApplicationDbContext`, PostgreSQL bağlantısı ve `InitialPostgres` migration |
