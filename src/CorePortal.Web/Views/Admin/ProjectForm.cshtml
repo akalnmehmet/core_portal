@@ -1,0 +1,14 @@
+@model ProjectForm
+@{ var edit = ViewBag.Id != null; ViewData["Title"] = edit ? "Projeyi düzenle" : "Yeni proje"; }
+<h1>@ViewData["Title"]</h1>
+<form method="post" class="col-md-8">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Name" class="form-label">Proje adı</label><input asp-for="Name" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="TeamId" class="form-label">Takım</label><select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select"><option value="">Takım seçin</option></select></div>
+    <div class="mb-3"><label asp-for="Summary" class="form-label">Özet</label><textarea asp-for="Summary" class="form-control" rows="4"></textarea></div>
+    <div class="mb-3"><label asp-for="Status" class="form-label">Durum</label><input asp-for="Status" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="ImageUrl" class="form-label">Görsel URL</label><input asp-for="ImageUrl" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="GitHubUrl" class="form-label">GitHub URL</label><input asp-for="GitHubUrl" class="form-control" /></div>
+    <button class="btn btn-primary">Kaydet</button>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

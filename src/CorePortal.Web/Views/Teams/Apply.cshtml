@@ -1,0 +1,10 @@
+@model TeamApplicationForm
+@{ ViewData["Title"] = "Takıma başvur"; }
+<h1>@ViewBag.Team.Name takımına başvur</h1>
+<form method="post" class="col-md-8">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Motivation" class="form-label">Motivasyonunuz</label><textarea asp-for="Motivation" class="form-control" rows="5"></textarea><span asp-validation-for="Motivation" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Skills" class="form-label">Yetkinlikleriniz</label><textarea asp-for="Skills" class="form-control" rows="3"></textarea><span asp-validation-for="Skills" class="text-danger"></span></div>
+    <button class="btn btn-primary">Başvuruyu gönder</button>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

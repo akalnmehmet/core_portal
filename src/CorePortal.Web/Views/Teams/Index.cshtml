@@ -1,0 +1,12 @@
+@model IReadOnlyList<Team>
+@{ ViewData["Title"] = "Ar-Ge Takımları"; }
+<h1>Ar-Ge Takımları</h1>
+<div class="row g-3">
+@foreach (var team in Model) {
+    <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="h5 card-title">@team.Name</h2><p class="text-muted">@team.Field · @team.FoundedYear</p>
+        <p>@team.Description</p><a asp-action="Details" asp-route-id="@team.Id" class="btn btn-outline-primary">Detay</a>
+    </div></div></div>
+}
+</div>
+@if (Model.Count == 0) { <p>Henüz takım eklenmedi.</p> }

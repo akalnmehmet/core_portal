@@ -1,0 +1,7 @@
+@model Team
+@{ ViewData["Title"] = Model.Name; }
+<h1>@Model.Name</h1><p class="text-muted">@Model.Field · @Model.FoundedYear</p>
+<p>@Model.Description</p>
+<a asp-action="Apply" asp-route-id="@Model.Id" class="btn btn-primary">Takıma başvur</a>
+<h2 class="h4 mt-5">Projeler</h2>
+@foreach (var project in Model.Projects) { <p><a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id">@project.Name</a> · @project.Status</p> }

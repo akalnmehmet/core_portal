@@ -1,0 +1,55 @@
+using CorePortal.Web.Data;
+using CorePortal.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace CorePortal.Web.Controllers;
+
+public class TeamsController(ApplicationDbContext db, UserManager<ApplicationUser> users) : Controller
+{
+    public async Task<IActionResult> Index() => View(await db.Teams.AsNoTracking().OrderBy(x => x.Name).ToListAsync());
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var team = await db.Teams.AsNoTracking().Include(x => x.Projects).FirstOrDefaultAsync(x => x.Id == id);
+        return team is null ? NotFound() : View(team);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Apply(int id)
+    {
+        var team = await db.Teams.FindAsync(id);
+        if (team is null) return NotFound();
+        ViewBag.Team = team;
+        return View(new TeamApplicationForm());
+    }
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Apply(int id, TeamApplicationForm form)
+    {
+        var team = await db.Teams.FindAsync(id);
+        if (team is null) return NotFound();
+        ViewBag.Team = team;
+        if (!ModelState.IsValid) return View(form);
+        var userId = users.GetUserId(User)!;
+        if (await db.TeamApplications.AnyAsync(x => x.TeamId == id && x.UserId == userId))
+        {
+            ModelState.AddModelError("", "Bu takıma zaten başvurdunuz.");
+            return View(form);
+        }
+        db.TeamApplications.Add(new TeamApplication
+        {
+            TeamId = id, UserId = userId, Motivation = form.Motivation.Trim(), Skills = form.Skills.Trim()
+        });
+        try { await db.SaveChangesAsync(); }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Başvuru kaydedilemedi veya zaten mevcut.");
+            return View(form);
+        }
+        TempData["Message"] = "Takım başvurunuz alındı.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+}

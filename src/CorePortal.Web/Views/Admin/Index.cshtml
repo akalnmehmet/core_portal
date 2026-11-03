@@ -1,0 +1,12 @@
+@model CorePortal.Web.Controllers.AdminDashboard
+@{ ViewData["Title"] = "Yönetim"; }
+<h1>Yönetim</h1>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card card-body">Takımlar <strong>@Model.Teams</strong></div></div>
+    <div class="col-md-3"><div class="card card-body">Projeler <strong>@Model.Projects</strong></div></div>
+    <div class="col-md-3"><div class="card card-body">Bekleyen etkinlik başvuruları <strong>@Model.PendingEventRegistrations</strong></div></div>
+    <div class="col-md-3"><div class="card card-body">Bekleyen takım başvuruları <strong>@Model.PendingTeamApplications</strong></div></div>
+</div>
+<a asp-action="Teams" class="btn btn-primary me-2">Takımları yönet</a>
+<a asp-action="Projects" class="btn btn-primary me-2">Projeleri yönet</a>
+<a href="/swagger" class="btn btn-outline-secondary">API</a>

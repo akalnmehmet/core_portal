@@ -1,0 +1,9 @@
+@model IReadOnlyList<Project>
+@{ ViewData["Title"] = "Proje yönetimi"; }
+<h1>Proje yönetimi</h1><a asp-action="CreateProject" class="btn btn-primary mb-3">Yeni proje</a>
+<table class="table"><thead><tr><th>Ad</th><th>Takım</th><th>Durum</th><th></th></tr></thead><tbody>
+@foreach (var project in Model) { <tr><td>@project.Name</td><td>@project.Team.Name</td><td>@project.Status</td><td>
+    <a asp-action="EditProject" asp-route-id="@project.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+    <form asp-action="DeleteProject" asp-route-id="@project.Id" method="post" class="d-inline" onsubmit="return confirm('Proje silinsin mi?')"><button class="btn btn-sm btn-outline-danger">Sil</button></form>
+</td></tr> }
+</tbody></table>

@@ -1,0 +1,17 @@
+@model IReadOnlyList<Project>
+@using CorePortal.Web.Services
+@{ ViewData["Title"] = "Projeler"; var repos = (IReadOnlyList<GitHubRepository>)ViewBag.Repositories; }
+<h1>Projeler</h1>
+<div class="row g-3">
+@foreach (var project in Model) {
+    <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="h5">@project.Name</h2><p class="text-muted">@project.Team.Name · @project.Status</p>
+        <p>@project.Summary</p><a asp-action="Details" asp-route-id="@project.Id" class="btn btn-outline-primary">Detay</a>
+    </div></div></div>
+}
+</div>
+@if (Model.Count == 0) { <p>Henüz proje eklenmedi.</p> }
+@if (repos.Count > 0) {
+    <h2 class="h4 mt-5">Açık kaynak depoları</h2>
+    @foreach (var repo in repos) { <p><a href="@repo.HtmlUrl" target="_blank" rel="noopener noreferrer">@repo.Name</a> · @repo.Description</p> }
+}

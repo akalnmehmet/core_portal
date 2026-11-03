@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+.localtest/
+.vs/
+.idea/
+*.user
+*.suo
+app.db
+**/app.db
+*.log
+BLM4581_CORE_Portal_Plan_Belgesi.docx
