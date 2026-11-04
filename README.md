@@ -107,6 +107,31 @@ Bu yardımcı projeyi derler, `.localtest/acceptance-...` altında ayrı Postgre
 
 PortalFlows; detay sayfalarında Pending/Approved/Rejected durumlarını, başvuru durumunun başka kullanıcıya gösterilmemesini, giriş dönüşünü ve karar sonrası yönetici filtresinin korunmasını da doğrular. Aynı etkinlikteki son yer için iki paralel istek göndererek tek aktif kayıt oluştuğunu kontrol eder.
 
+## Örnek verilerle yerel gösterim
+
+Windows ve PowerShell 7 üzerinde PostgreSQL araçları kuruluysa:
+
+```powershell
+./scripts/Start-LocalDemo.ps1
+# Gerekirse araç yollarını açıkça verin:
+# ./scripts/Start-LocalDemo.ps1 -DotnetPath 'C:\path\to\dotnet.exe' -PostgresBin 'C:\Program Files\PostgreSQL\18\bin'
+```
+
+Komut uygulamayı ayrı bir yayın klasörüne hazırlar ve bağımsız PostgreSQL kümesiyle yalnızca `127.0.0.1` üzerinde açar. .NET SDK PATH'te değilse daha önce bu proje için kurulan `%LOCALAPPDATA%/core-portal-dotnet/dotnet.exe` konumunu da kontrol eder. PostgreSQL araçları PATH'te değilse `-PostgresBin` belirtin. Önceki paketler için `dotnet restore` gerekir. Çalışan demonun yayın çıktısı ayrıdır; normal kaynak kodunu derlerken demo dosyaları kilitlemez.
+
+Adres ve rastgele üretilen Admin/öğrenci giriş bilgileri `.localdemo/current.json` içindedir. Bu klasör Git tarafından dışlanır. Sayfada örnek verilerle çalışıldığını belirten bir etiket gösterilir. Etiket yalnızca Development ortamında `Demo__Enabled=true` olduğunda açılır; standart kurulumda kapalıdır. Örnek kayıtlar gerçek topluluk duyurusu veya etkinliği değildir.
+
+Demoda 2 takım, 3 proje, 2 yaklaşan/1 geçmiş etkinlik ve 2 duyuru bulunur. Öğrenci hesabının bir takım başvurusu onaylı, bir etkinlik başvurusu beklemededir. Başlatıcı mevcut veritabanınıza bağlanmaz; ayarladığı süreç ortam değişkenlerini dönüşte geri yükler. İkinci kez başlatma, önceki demo kapatılana kadar engellenir.
+
+```powershell
+./tests/Test-LocalDemo.ps1 # Açık demonun içerik ve hesaplarını doğrular
+./scripts/Stop-LocalDemo.ps1 # Demo süreçlerini kapatır ve örnek verileri temizler
+# Log/veritabanı dosyalarını inceleme amacıyla korumak için:
+# ./scripts/Stop-LocalDemo.ps1 -KeepFiles
+```
+
+Kapatma komutu normalde demo üzerinde yaptığınız değişiklikleri de siler; tekrar başlatmak yeni örnek ortam oluşturur. `-KeepFiles` bir yeniden başlatma mekanizması değildir; durdurulmuş dosyaları inceleme için saklar. Kısa bir sunum yolu için `docs/Gosterim_Akisi.md` belgesine bakın.
+
 ## Kaynak haritası
 
 `Program.cs`: servisler, kimlik, yönlendirme. `Models`: entity, form ve ViewModel sınıfları. `Data`: DbContext, migration, seed ve çakışma tanıma. `Controllers`: MVC/API istekleri. `Views`: Razor HTML şablonları. `Services`: GitHub istemcisi. `wwwroot`: CSS/JavaScript. `docs`: faz belgeleri ve başlangıç öğrenme rehberi.

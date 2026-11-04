@@ -1,6 +1,7 @@
 **/bin/
 **/obj/
 .localtest/
+.localdemo/
 .vs/
 .idea/
 *.user

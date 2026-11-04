@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="~/CorePortal.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @inject Microsoft.Extensions.Configuration.IConfiguration PortalConfiguration
+    @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment PortalEnvironment
+    @if (PortalEnvironment.EnvironmentName == "Development" && PortalConfiguration.GetValue<bool>("Demo:Enabled")) {
+        <div class="alert alert-warning rounded-0 mb-0 text-center" role="status">Yerel gösterim ortamı — içerikler ve hesaplar örnektir.</div>
+    }
     <a class="visually-hidden-focusable skip-link" href="#main-content">İçeriğe geç</a>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">

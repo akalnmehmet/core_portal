@@ -28,6 +28,12 @@ Takım ve etkinlik detay sayfaları artık oturumdaki kullanıcının başvuru d
 
 `tests/Invoke-LocalAcceptance.ps1` Windows/PowerShell 7 için tekrarlanabilir, mevcut veritabanından bağımsız bir doğrulama ortamı açıp kapatıyor. 4 Kasım 2026 tarihinde bu yardımcıyla .NET 10.0.402 üzerinde 0 derleme hatası, Smoke PASS, genişletilmiş PortalFlows PASS ve geçici PostgreSQL kümesi temizliği doğrulandı. NU1900 ağ erişimi uyarısı devam etti. Bu ek tur HTTP/Razor çıktıları ve veritabanı akışları üzerinden doğrulandı; bu turda yeni bir Chrome görsel kontrolü yapılmadı.
 
+## Yerel gösterim ortamı
+
+`scripts/Start-LocalDemo.ps1` uygulamayı ayrı yayın çıktısı ve ayrı PostgreSQL kümesiyle yalnızca 127.0.0.1 üzerinde açar. Örnek içerikler mevcut MVC/API uç noktalarından oluşturulur; uygulama başlangıcında gerçek veritabanına otomatik örnek veri eklenmez. Demoda 2 takım, 3 proje, 3 etkinlik, 2 duyuru ve onaylı/bekleyen başvuruları bulunan örnek öğrenci vardır. İki hesabın parolaları her açılışta rastgele üretilir; adresle birlikte Git dışı `.localdemo/current.json` dosyasına yazılır.
+
+`tests/Test-LocalDemo.ps1` ile örnek içerik sayıları, geçmiş/yaklaşan dağılımı, yayımlanan CSS/JS dosyaları, Admin/öğrenci girişleri, profil durumları, rol ayrımı ve ikinci kez başlatma koruması doğrulandı. Demo kapatma ve dosya temizleme akışı da çalıştırıldı. Gösterim adımları `Gosterim_Akisi.md`, başlatma/kapatma komutları README içindedir. Demo etiketi sadece Development ve açık Demo ayarında gösterilir. Veri şeması değişmedi.
+
 ## Ders teslimine kalan dış işler
 
 Gerçek içeriklerin ve topluluk bilgilerinin gözden geçirilmesi; GitHub görünürlüğü/collaborator erişimi, gerçek Drive bağlantısı, haftalık videolar ve sınıf gösterimi kullanıcı hesabı ve ders süreci üzerinden yürütülür. Yerel kod tamamlanması bu teslimlerin yapıldığını göstermez.
