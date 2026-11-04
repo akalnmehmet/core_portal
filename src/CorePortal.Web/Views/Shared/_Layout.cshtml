@@ -10,15 +10,16 @@
     <link rel="stylesheet" href="~/CorePortal.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="visually-hidden-focusable skip-link" href="#main-content">İçeriğe geç</a>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">CORE Portal</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navigation" aria-controls="main-navigation"
+                        aria-expanded="false" aria-label="Menüyü aç veya kapat">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div id="main-navigation" class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
@@ -28,6 +29,8 @@
                         </li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Projects" asp-action="Index">Projeler</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index">Etkinlikler</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Announcements" asp-action="Index">Duyurular</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="About">Hakkımızda</a></li>
                         @if (User.IsInRole("Admin")) { <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Index">Yönetim</a></li> }
                     </ul>
                     <partial name="_LoginPartial" />
@@ -36,7 +39,7 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main id="main-content" class="pb-3">
             @if (TempData["Message"] is string message) { <div class="alert alert-info" role="status">@message</div> }
             @RenderBody()
         </main>

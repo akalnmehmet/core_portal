@@ -35,6 +35,10 @@ $env:GitHub__OwnerType = 'organization'
 dotnet run --project src/CorePortal.Web/CorePortal.Web.csproj
 ```
 
-## Entegrasyon notları
+## Güncel devam kapsamı
+
+4 Kasım 2026 tarihinde görev dağılımından bağımsız olarak kalan yazılım modüllerinin tamamının bu çalışma kapsamında üstlenilmesine karar verildi. Güncel kurulum bilgileri kökteki `README.md`, yeni modüller `Portal_Tamamlama_Notlari.md` belgesindedir. Aşağıdaki ilk teslim notu tarihsel bağlamdır.
+
+## İlk teslim entegrasyon notları
 
 Tarık'ın sorumluluğundaki vitrin, duyuru CRUD, başvuru onay/red, profil, filtreleme ve son README düzenlemesi bu temelin üzerine eklenebilir. Veri tabloları ve ilişkileri hazırdır. Proje klasöründe başlangıçta yalnızca plan belgesi vardı; oluşturulan kaynak kodu plan belgesindeki GitHub deposunun `main` dalına gönderildi.

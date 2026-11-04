@@ -10,7 +10,21 @@ namespace CorePortal.Web.Controllers;
 
 public class EventsController(ApplicationDbContext db, UserManager<ApplicationUser> users) : Controller
 {
-    public async Task<IActionResult> Index() => View(await db.Events.AsNoTracking().OrderBy(x => x.StartsAt).ToListAsync());
+    public async Task<IActionResult> Index(string? q, string? period)
+    {
+        q = PortalText.Search(q);
+        ViewBag.Query = q; ViewBag.Period = period;
+        var query = db.Events.AsNoTracking();
+        if (q is not null)
+        {
+            var pattern = PortalText.Pattern(q);
+            query = query.Where(x => EF.Functions.ILike(x.Title, pattern) || EF.Functions.ILike(x.Location, pattern));
+        }
+        var now = DateTime.UtcNow;
+        if (period == "upcoming") query = query.Where(x => x.StartsAt > now);
+        if (period == "past") query = query.Where(x => x.StartsAt <= now);
+        return View(await query.OrderBy(x => x.StartsAt).ToListAsync());
+    }
 
     public async Task<IActionResult> Details(int id)
     {
@@ -39,7 +53,7 @@ public class EventsController(ApplicationDbContext db, UserManager<ApplicationUs
             await transaction.CommitAsync();
             TempData["Message"] = "Etkinlik başvurunuz alındı.";
         }
-        catch (DbUpdateException)
+        catch (Exception ex) when (ex is DbUpdateException || DatabaseErrors.IsConflict(ex))
         {
             TempData["Message"] = "Kayıt tamamlanamadı. Lütfen yeniden deneyin.";
         }

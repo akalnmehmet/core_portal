@@ -1,0 +1,32 @@
+@model ProfileViewModel
+@{ ViewData["Title"] = "Profilim ve başvurularım"; }
+<h1>Profilim ve başvurularım</h1><p class="text-muted">@Model.Email</p>
+<form method="post" class="col-lg-7 mb-5">
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<div class="mb-3"><label asp-for="Form.FullName" class="form-label">Ad soyad</label><input asp-for="Form.FullName" class="form-control" autocomplete="name" /><span asp-validation-for="Form.FullName" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Form.Department" class="form-label">Bölüm</label><input asp-for="Form.Department" class="form-control" /><span asp-validation-for="Form.Department" class="text-danger"></span></div>
+<button class="btn btn-primary">Profili güncelle</button>
+</form>
+<h2 class="h4">Etkinlik başvurularım</h2>
+<div class="row g-3 mb-4">
+@foreach (var item in Model.EventRegistrations) {
+<div class="col-md-6"><article class="card card-body h-100">
+<h3 class="h5"><a asp-controller="Events" asp-action="Details" asp-route-id="@item.EventId">@item.Event.Title</a></h3>
+<p>@item.Event.StartsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.Event.Location</p>
+<p class="mb-0"><span class="badge text-bg-secondary">@item.Status.Label()</span> <span class="small">Başvuru: @item.AppliedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></p>
+</article></div>
+}
+</div>
+@if (Model.EventRegistrations.Count == 0) { <p>Henüz etkinlik başvurun yok. <a asp-controller="Events" asp-action="Index">Etkinlikleri keşfet.</a></p> }
+<h2 class="h4">Takım başvurularım</h2>
+<div class="row g-3">
+@foreach (var item in Model.TeamApplications) {
+<div class="col-md-6"><article class="card card-body h-100">
+<h3 class="h5"><a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamId">@item.Team.Name</a></h3>
+<p class="preserve-lines">@item.Motivation</p><p><strong>Yetkinliklerin:</strong> @item.Skills</p>
+<p class="mb-0"><span class="badge text-bg-secondary">@item.Status.Label()</span> <span class="small">Başvuru: @item.AppliedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></p>
+</article></div>
+}
+</div>
+@if (Model.TeamApplications.Count == 0) { <p>Henüz takım başvurun yok. <a asp-controller="Teams" asp-action="Index">Takımları keşfet.</a></p> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

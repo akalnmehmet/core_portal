@@ -8,6 +8,13 @@ namespace CorePortal.Web.Controllers;
 [Route("account")]
 public class AccountController(UserManager<ApplicationUser> users, SignInManager<ApplicationUser> signIn) : Controller
 {
+    [HttpGet("denied")]
+    public IActionResult Denied()
+    {
+        Response.StatusCode = StatusCodes.Status403Forbidden;
+        return View();
+    }
+
     [HttpGet("register")]
     public IActionResult Register() => View(new RegisterForm());
 

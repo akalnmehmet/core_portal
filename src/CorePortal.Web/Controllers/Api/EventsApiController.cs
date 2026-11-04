@@ -34,6 +34,7 @@ public class EventsApiController(ApplicationDbContext db) : ControllerBase
     [Authorize(Roles = "Admin"), HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, EventForm form)
     {
+        await using var transaction = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
         var x = await db.Events.FindAsync(id);
         if (x is null) return NotFound();
         if (form.StartsAt.Kind != DateTimeKind.Utc) return BadRequest("startsAt UTC olmalıdır.");
@@ -41,8 +42,16 @@ public class EventsApiController(ApplicationDbContext db) : ControllerBase
         if (form.Capacity < registrations) return Conflict("Kontenjan mevcut başvuru sayısından küçük olamaz.");
         x.Title = form.Title.Trim(); x.Description = form.Description.Trim(); x.StartsAt = form.StartsAt;
         x.Location = form.Location.Trim(); x.Capacity = form.Capacity; x.PosterUrl = form.PosterUrl;
-        await db.SaveChangesAsync();
-        return NoContent();
+        try
+        {
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+        catch (Exception ex) when (DatabaseErrors.IsConflict(ex))
+        {
+            return Conflict("Etkinlik başka bir işlemde değişti. Güncel bilgileri okuyup tekrar deneyin.");
+        }
     }
 
     [Authorize(Roles = "Admin"), HttpDelete("{id:int}")]

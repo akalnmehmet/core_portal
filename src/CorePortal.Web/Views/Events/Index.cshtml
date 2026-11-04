@@ -1,10 +1,15 @@
 @model IReadOnlyList<Event>
 @{ ViewData["Title"] = "Etkinlikler"; }
 <h1>Etkinlikler</h1>
+<form method="get" class="row g-2 mb-4 align-items-end" role="search">
+    <div class="col-md-5"><label for="q" class="form-label">Etkinliklerde ara</label><input id="q" name="q" value="@ViewBag.Query" maxlength="200" class="form-control" placeholder="Başlık veya konum" /></div>
+    <div class="col-md-4"><label for="period" class="form-label">Tarih aralığı</label><select id="period" name="period" class="form-select"><option value="">Tümü</option><option value="upcoming" selected="@(ViewBag.Period == "upcoming")">Yaklaşan etkinlikler</option><option value="past" selected="@(ViewBag.Period == "past")">Geçmiş etkinlikler</option></select></div>
+    <div class="col-md-auto"><button class="btn btn-primary">Filtrele</button> <a asp-action="Index" class="btn btn-outline-secondary">Temizle</a></div>
+</form>
 @foreach (var item in Model) {
     <div class="card mb-3"><div class="card-body">
         <h2 class="h5">@item.Title</h2><p>@item.StartsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.Location</p>
         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Detay ve başvuru</a>
     </div></div>
 }
-@if (Model.Count == 0) { <p>Henüz etkinlik eklenmedi.</p> }
+@if (Model.Count == 0) { <p class="empty-state">Bu filtrelerde etkinlik bulunamadı.</p> }

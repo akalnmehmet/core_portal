@@ -2,9 +2,32 @@
     ViewData["Title"] = "Ana Sayfa";
 }
 
+@model HomeViewModel
 <div class="py-5">
     <h1 class="display-4 fw-bold">CORE Portal</h1>
     <p class="lead">Topluluk etkinlikleri, Ar-Ge takımları ve projeleri tek yerde.</p>
     <a class="btn btn-primary me-2" asp-controller="Events" asp-action="Index">Etkinlikleri gör</a>
     <a class="btn btn-outline-primary" asp-controller="Teams" asp-action="Index">Takımları keşfet</a>
 </div>
+<p><a asp-action="About">CORE hakkında</a> · <a asp-controller="Announcements" asp-action="Index">Tüm duyurular</a></p>
+<div class="row g-3 mb-5" aria-label="Topluluk özeti">
+    <div class="col-sm-4"><div class="card card-body"><strong class="h3">@Model.Teams</strong>Ar-Ge takımı</div></div>
+    <div class="col-sm-4"><div class="card card-body"><strong class="h3">@Model.Projects</strong>Proje</div></div>
+    <div class="col-sm-4"><div class="card card-body"><strong class="h3">@Model.UpcomingEvents</strong>Yaklaşan etkinlik</div></div>
+</div>
+<h2>Son duyurular</h2>
+<div class="row g-3 mb-5">
+@foreach (var item in Model.Announcements) {
+    <div class="col-md-4"><article class="card card-body h-100">
+        <h3 class="h5"><a asp-controller="Announcements" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></h3>
+        <p class="text-muted">@item.PublishedAt.ToLocalTime().ToString("dd.MM.yyyy")</p>
+        <p class="text-preview">@(item.Content.Length > 180 ? item.Content[..180] + "…" : item.Content)</p>
+    </article></div>
+}
+</div>
+@if (Model.Announcements.Count == 0) { <p>Henüz duyuru yayımlanmadı.</p> }
+<h2>Sıradaki etkinlikler</h2>
+@foreach (var item in Model.Events) {
+    <article class="card card-body mb-3"><h3 class="h5"><a asp-controller="Events" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></h3><p class="mb-0">@item.StartsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.Location</p></article>
+}
+@if (Model.Events.Count == 0) { <p>Yeni etkinlikler yayımlandığında burada görünecek.</p> }

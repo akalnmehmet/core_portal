@@ -1,0 +1,37 @@
+@model ApplicationsViewModel
+@{ ViewData["Title"] = "Başvuru yönetimi"; }
+<h1>Başvuru yönetimi</h1>
+<form method="get" class="row g-2 mb-4 align-items-end">
+<div class="col-sm-5"><label for="status" class="form-label">Başvuru durumu</label><select id="status" name="status" class="form-select"><option value="">Tümü</option>
+@foreach (var status in Enum.GetValues<ApplicationStatus>()) { <option value="@status" selected="@(Model.Status == status)">@status.Label()</option> }
+</select></div><div class="col-sm-auto"><button class="btn btn-primary">Filtrele</button> <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">Yönetim paneli</a></div>
+</form>
+<p class="text-muted">Bekleyen ve onaylı etkinlik başvuruları kontenjana dahildir. Reddedilen başvuru yeniden etkinleştirilirken kontenjan kontrol edilir.</p>
+<h2 class="h4">Etkinlik başvuruları <span class="text-muted">(@Model.Events.Count)</span></h2>
+<div class="table-responsive mb-4"><table class="table align-middle"><thead><tr><th>Öğrenci</th><th>Etkinlik</th><th>Tarih</th><th>Durum</th><th>Karar</th></tr></thead><tbody>
+@foreach (var item in Model.Events) {
+<tr><td>@item.User.FullName<br /><span class="small text-muted">@item.User.Email</span></td><td>@item.Event.Title</td><td>@item.AppliedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td><td>@item.Status.Label()</td><td>
+<form asp-action="EventStatus" asp-route-id="@item.Id" method="post" class="decision-form" data-application-id="@item.Id">
+<label for="event-status-@item.Id" class="visually-hidden">@item.User.FullName için başvuru kararı</label>
+<select id="event-status-@item.Id" name="status" class="form-select form-select-sm">
+@foreach (var status in Enum.GetValues<ApplicationStatus>()) { <option value="@status" selected="@(item.Status == status)">@status.Label()</option> }
+</select><button class="btn btn-sm btn-primary">Kaydet</button>
+</form></td></tr>
+}
+</tbody></table></div>
+@if (Model.Events.Count == 0) { <p>Bu filtrede etkinlik başvurusu yok.</p> }
+<h2 class="h4">Takım başvuruları <span class="text-muted">(@Model.Teams.Count)</span></h2>
+@foreach (var item in Model.Teams) {
+<article class="card card-body mb-3">
+<h3 class="h5">@item.Team.Name · @item.User.FullName</h3>
+<p class="small text-muted">@item.User.Email · @item.AppliedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+<p class="preserve-lines"><strong>Motivasyon:</strong> @item.Motivation</p>
+<p class="preserve-lines"><strong>Yetkinlikler:</strong> @item.Skills</p><p>Durum: @item.Status.Label()</p>
+<form asp-action="TeamStatus" asp-route-id="@item.Id" method="post" class="decision-form" data-application-id="@item.Id">
+<label for="team-status-@item.Id" class="visually-hidden">@item.User.FullName için başvuru kararı</label>
+<select id="team-status-@item.Id" name="status" class="form-select form-select-sm">
+@foreach (var status in Enum.GetValues<ApplicationStatus>()) { <option value="@status" selected="@(item.Status == status)">@status.Label()</option> }
+</select><button class="btn btn-sm btn-primary">Kaydet</button>
+</form></article>
+}
+@if (Model.Teams.Count == 0) { <p>Bu filtrede takım başvurusu yok.</p> }

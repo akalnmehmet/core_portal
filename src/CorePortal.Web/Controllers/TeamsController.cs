@@ -9,7 +9,20 @@ namespace CorePortal.Web.Controllers;
 
 public class TeamsController(ApplicationDbContext db, UserManager<ApplicationUser> users) : Controller
 {
-    public async Task<IActionResult> Index() => View(await db.Teams.AsNoTracking().OrderBy(x => x.Name).ToListAsync());
+    public async Task<IActionResult> Index(string? q, string? field)
+    {
+        q = PortalText.Search(q); field = PortalText.Search(field);
+        ViewBag.Query = q; ViewBag.Field = field;
+        ViewBag.Fields = await db.Teams.AsNoTracking().Select(x => x.Field).Distinct().OrderBy(x => x).ToListAsync();
+        var query = db.Teams.AsNoTracking();
+        if (q is not null)
+        {
+            var pattern = PortalText.Pattern(q);
+            query = query.Where(x => EF.Functions.ILike(x.Name, pattern) || EF.Functions.ILike(x.Description, pattern));
+        }
+        if (field is not null) query = query.Where(x => x.Field == field);
+        return View(await query.OrderBy(x => x.Name).ToListAsync());
+    }
 
     public async Task<IActionResult> Details(int id)
     {

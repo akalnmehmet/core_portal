@@ -1,0 +1,14 @@
+@model EventEditForm
+@{ ViewData["Title"] = ViewContext.RouteData.Values["action"]?.ToString() == "EditEvent" ? "Etkinliği düzenle" : "Yeni etkinlik"; }
+<h1>@ViewData["Title"]</h1>
+<form method="post" class="col-lg-8">
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<div class="mb-3"><label asp-for="Title" class="form-label">Etkinlik adı</label><input asp-for="Title" class="form-control" /></div>
+<div class="mb-3"><label asp-for="Description" class="form-label">Açıklama</label><textarea asp-for="Description" class="form-control" rows="6"></textarea></div>
+<div class="mb-3"><label asp-for="StartsAtLocal" class="form-label">Başlangıç tarihi ve saati</label><input asp-for="StartsAtLocal" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" class="form-control" /><p class="form-text">Sunucunun yerel saat dilimine göre girilir; kayıt UTC olarak saklanır.</p></div>
+<div class="mb-3"><label asp-for="Location" class="form-label">Konum</label><input asp-for="Location" class="form-control" /></div>
+<div class="mb-3"><label asp-for="Capacity" class="form-label">Kontenjan</label><input asp-for="Capacity" class="form-control" /></div>
+<div class="mb-3"><label asp-for="PosterUrl" class="form-label">Afiş adresi</label><input asp-for="PosterUrl" class="form-control" /></div>
+<button class="btn btn-primary">Kaydet</button> <a asp-action="Events" class="btn btn-outline-secondary">Vazgeç</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

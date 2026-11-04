@@ -1,6 +1,7 @@
 @model CorePortal.Web.Controllers.AdminDashboard
 @{ ViewData["Title"] = "Yönetim"; }
 <h1>Yönetim</h1>
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostingEnvironment
 <div class="row g-3 mb-4">
     <div class="col-md-3"><div class="card card-body">Takımlar <strong>@Model.Teams</strong></div></div>
     <div class="col-md-3"><div class="card card-body">Projeler <strong>@Model.Projects</strong></div></div>
@@ -9,4 +10,7 @@
 </div>
 <a asp-action="Teams" class="btn btn-primary me-2">Takımları yönet</a>
 <a asp-action="Projects" class="btn btn-primary me-2">Projeleri yönet</a>
-<a href="/swagger" class="btn btn-outline-secondary">API</a>
+<a asp-controller="ContentAdmin" asp-action="Events" class="btn btn-primary me-2">Etkinlikleri yönet</a>
+<a asp-controller="ContentAdmin" asp-action="Announcements" class="btn btn-primary me-2">Duyuruları yönet</a>
+<a asp-controller="ApplicationsAdmin" asp-action="Index" class="btn btn-primary me-2">Başvuruları yönet</a>
+@if (HostingEnvironment.EnvironmentName == "Development") { <a href="/swagger" class="btn btn-outline-secondary">API</a> }

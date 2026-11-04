@@ -1,0 +1,13 @@
+@model IReadOnlyList<Announcement>
+@{ ViewData["Title"] = "Duyuru yönetimi"; }
+<h1>Duyuru yönetimi</h1>
+<div class="d-flex flex-wrap gap-2 mb-3"><a asp-action="CreateAnnouncement" class="btn btn-primary">Yeni duyuru</a><a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">Yönetim paneli</a></div>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Başlık</th><th>Yayın tarihi</th><th>Yazar</th><th>İşlemler</th></tr></thead><tbody>
+@foreach (var item in Model) {
+<tr><td><a asp-controller="Announcements" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></td><td>@item.PublishedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td><td>@item.Author.FullName</td><td class="action-cell">
+<a asp-action="EditAnnouncement" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+<form asp-action="DeleteAnnouncement" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Duyuru silinsin mi?')"><button class="btn btn-sm btn-outline-danger">Sil</button></form>
+</td></tr>
+}
+</tbody></table></div>
+@if (Model.Count == 0) { <p class="empty-state">Henüz duyuru yayımlanmadı.</p> }

@@ -15,7 +15,7 @@ function Get-Token($page) {
 function Post-Form($session, $path, $body) {
     $page = Invoke-WebRequest "$BaseUrl$path" -WebSession $session
     $body['__RequestVerificationToken'] = Get-Token $page
-    return Invoke-WebRequest "$BaseUrl$path" -WebSession $session -Method Post -Body $body
+    return Invoke-WebRequest "$BaseUrl$path" -WebSession $session -Method Post -Body $body -ContentType 'application/x-www-form-urlencoded'
 }
 
 $admin = New-Object Microsoft.PowerShell.Commands.WebRequestSession
@@ -46,7 +46,8 @@ $email = "smoke-$suffix@example.test"
 $register = Post-Form $member '/account/register' @{
     Email = $email; Password = 'SmokeTest!234'; ConfirmPassword = 'SmokeTest!234'; FullName = 'Smoke User'; Department = 'Engineering'
 }
-if (!$register.Content.Contains('Smoke User') -and !$register.Content.Contains($email)) { throw 'Üye kaydı başarısız.' }
+$registeredProfile = Invoke-WebRequest "$BaseUrl/profile" -WebSession $member
+if (!$registeredProfile.Content.Contains($email)) { throw 'Üye kaydı veya profil oturumu başarısız.' }
 $application = Post-Form $member "/teams/apply/$teamId" @{
     Motivation = 'I would like to help this team with its research projects.'; Skills = 'C sharp and PostgreSQL'
 }

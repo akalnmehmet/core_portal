@@ -1,0 +1,8 @@
+@model Announcement
+@{ ViewData["Title"] = Model.Title; }
+<article class="col-lg-9">
+<h1>@Model.Title</h1>
+<p class="text-muted">@Model.PublishedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @(Model.Author.FullName ?? "CORE Yönetimi")</p>
+<div class="preserve-lines">@Model.Content</div>
+<a asp-action="Index" class="btn btn-outline-secondary mt-4">Duyurulara dön</a>
+</article>

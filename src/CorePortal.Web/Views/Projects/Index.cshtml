@@ -2,6 +2,12 @@
 @using CorePortal.Web.Services
 @{ ViewData["Title"] = "Projeler"; var repos = (IReadOnlyList<GitHubRepository>)ViewBag.Repositories; }
 <h1>Projeler</h1>
+<form method="get" class="row g-2 mb-4 align-items-end" role="search">
+    <div class="col-md-4"><label for="q" class="form-label">Projelerde ara</label><input id="q" name="q" value="@ViewBag.Query" maxlength="200" class="form-control" placeholder="Ad veya özet" /></div>
+    <div class="col-md-3"><label for="teamId" class="form-label">Takım</label><select id="teamId" name="teamId" class="form-select"><option value="">Tüm takımlar</option>@foreach (Team team in ViewBag.Teams) { <option value="@team.Id" selected="@(ViewBag.TeamId == team.Id)">@team.Name</option> }</select></div>
+    <div class="col-md-3"><label for="status" class="form-label">Proje durumu</label><select id="status" name="status" class="form-select"><option value="">Tüm durumlar</option>@foreach (string status in ViewBag.Statuses) { <option value="@status" selected="@(ViewBag.Status == status)">@status</option> }</select></div>
+    <div class="col-md-auto"><button class="btn btn-primary">Filtrele</button> <a asp-action="Index" class="btn btn-outline-secondary">Temizle</a></div>
+</form>
 <div class="row g-3">
 @foreach (var project in Model) {
     <div class="col-md-6"><div class="card h-100"><div class="card-body">
@@ -10,7 +16,7 @@
     </div></div></div>
 }
 </div>
-@if (Model.Count == 0) { <p>Henüz proje eklenmedi.</p> }
+@if (Model.Count == 0) { <p class="empty-state">Bu filtrelerde proje bulunamadı.</p> }
 @if (repos.Count > 0) {
     <h2 class="h4 mt-5">Açık kaynak depoları</h2>
     @foreach (var repo in repos) { <p><a href="@repo.HtmlUrl" target="_blank" rel="noopener noreferrer">@repo.Name</a> · @repo.Description</p> }

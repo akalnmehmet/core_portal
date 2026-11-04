@@ -1,0 +1,10 @@
+@model AnnouncementForm
+@{ ViewData["Title"] = ViewContext.RouteData.Values["action"]?.ToString() == "EditAnnouncement" ? "Duyuruyu düzenle" : "Yeni duyuru"; }
+<h1>@ViewData["Title"]</h1>
+<form method="post" class="col-lg-8">
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<div class="mb-3"><label asp-for="Title" class="form-label">Başlık</label><input asp-for="Title" class="form-control" /></div>
+<div class="mb-3"><label asp-for="Content" class="form-label">Duyuru metni</label><textarea asp-for="Content" class="form-control" rows="10"></textarea><p class="form-text">Düz metin olarak yayımlanır; satır sonları korunur.</p></div>
+<button class="btn btn-primary">Kaydet</button> <a asp-action="Announcements" class="btn btn-outline-secondary">Vazgeç</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
