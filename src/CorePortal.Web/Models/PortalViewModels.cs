@@ -34,6 +34,9 @@ public class EventEditForm
 public record ApplicationsViewModel(IReadOnlyList<EventRegistration> Events,
     IReadOnlyList<TeamApplication> Teams, ApplicationStatus? Status);
 
+public record EventDetailsViewModel(Event Event, int Occupied, ApplicationStatus? Status);
+public record TeamDetailsViewModel(Team Team, ApplicationStatus? Status);
+
 public static class PortalText
 {
     public static string Label(this ApplicationStatus status) => status switch

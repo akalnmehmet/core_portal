@@ -26,7 +26,7 @@ public class ApplicationsAdminController(ApplicationDbContext db) : Controller
     }
 
     [HttpPost("events/{id:int}/status"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> EventStatus(int id, ApplicationStatus? status)
+    public async Task<IActionResult> EventStatus(int id, ApplicationStatus? status, ApplicationStatus? filterStatus)
     {
         if (!ModelState.IsValid || !status.HasValue || !Enum.IsDefined(status.Value)) return BadRequest();
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
@@ -38,7 +38,7 @@ public class ApplicationsAdminController(ApplicationDbContext db) : Controller
             if (occupied >= item.Event.Capacity)
             {
                 TempData["Message"] = "Etkinlik dolu; reddedilen başvuru yeniden etkinleştirilemedi.";
-                return RedirectToAction(nameof(Index));
+                return ReturnToList(filterStatus);
             }
         }
         item.Status = status.Value;
@@ -52,11 +52,11 @@ public class ApplicationsAdminController(ApplicationDbContext db) : Controller
         {
             TempData["Message"] = "Başvuru başka bir işlemde değişti. Güncel durumu kontrol edip tekrar deneyin.";
         }
-        return RedirectToAction(nameof(Index));
+        return ReturnToList(filterStatus);
     }
 
     [HttpPost("teams/{id:int}/status"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> TeamStatus(int id, ApplicationStatus? status)
+    public async Task<IActionResult> TeamStatus(int id, ApplicationStatus? status, ApplicationStatus? filterStatus)
     {
         if (!ModelState.IsValid || !status.HasValue || !Enum.IsDefined(status.Value)) return BadRequest();
         var item = await db.TeamApplications.FindAsync(id);
@@ -64,6 +64,9 @@ public class ApplicationsAdminController(ApplicationDbContext db) : Controller
         item.Status = status.Value;
         await db.SaveChangesAsync();
         TempData["Message"] = "Takım başvurusunun durumu güncellendi.";
-        return RedirectToAction(nameof(Index));
+        return ReturnToList(filterStatus);
     }
+
+    private RedirectToActionResult ReturnToList(ApplicationStatus? filterStatus) => RedirectToAction(nameof(Index),
+        new { status = filterStatus.HasValue && Enum.IsDefined(filterStatus.Value) ? filterStatus : null });
 }

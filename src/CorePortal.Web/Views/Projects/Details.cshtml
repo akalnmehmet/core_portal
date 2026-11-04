@@ -1,5 +1,6 @@
 @model Project
 @{ ViewData["Title"] = Model.Name; }
-<h1>@Model.Name</h1><p class="text-muted">@Model.Team.Name · @Model.Status</p>
-<p>@Model.Summary</p>
+<a asp-action="Index" class="d-inline-block mb-3">Projelere dön</a>
+<h1>@Model.Name</h1><p class="text-muted"><a asp-controller="Teams" asp-action="Details" asp-route-id="@Model.TeamId">@Model.Team.Name</a> · @Model.Status</p>
+<p class="preserve-lines">@Model.Summary</p>
 @if (!string.IsNullOrWhiteSpace(Model.GitHubUrl)) { <a href="@Model.GitHubUrl" target="_blank" rel="noopener noreferrer">GitHub deposu</a> }

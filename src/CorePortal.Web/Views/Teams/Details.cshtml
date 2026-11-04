@@ -1,7 +1,18 @@
-@model Team
-@{ ViewData["Title"] = Model.Name; }
-<h1>@Model.Name</h1><p class="text-muted">@Model.Field · @Model.FoundedYear</p>
-<p>@Model.Description</p>
-<a asp-action="Apply" asp-route-id="@Model.Id" class="btn btn-primary">Takıma başvur</a>
+@model TeamDetailsViewModel
+@{ ViewData["Title"] = Model.Team.Name; }
+<a asp-action="Index" class="d-inline-block mb-3">Takımlara dön</a>
+<h1>@Model.Team.Name</h1><p class="text-muted">@Model.Team.Field · @Model.Team.FoundedYear</p>
+<p class="preserve-lines">@Model.Team.Description</p>
+@if (Model.Status.HasValue) {
+    <div class="alert alert-secondary" role="status" data-application-status="@Model.Status">
+        Başvuru durumunuz: <strong>@Model.Status.Value.Label()</strong>.
+        <a asp-controller="Profile" asp-action="Index">Başvurularımı görüntüle</a>
+    </div>
+} else if (User.Identity?.IsAuthenticated == true) {
+    <a asp-action="Apply" asp-route-id="@Model.Team.Id" class="btn btn-primary">Takıma başvur</a>
+} else {
+    <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Apply", "Teams", new { id = Model.Team.Id })" class="btn btn-primary">Başvurmak için giriş yap</a>
+}
 <h2 class="h4 mt-5">Projeler</h2>
-@foreach (var project in Model.Projects) { <p><a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id">@project.Name</a> · @project.Status</p> }
+@foreach (var project in Model.Team.Projects) { <p><a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id">@project.Name</a> · @project.Status</p> }
+@if (Model.Team.Projects.Count == 0) { <p class="text-muted">Bu takım için henüz proje eklenmedi.</p> }

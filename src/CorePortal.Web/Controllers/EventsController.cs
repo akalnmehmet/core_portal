@@ -28,7 +28,12 @@ public class EventsController(ApplicationDbContext db, UserManager<ApplicationUs
 
     public async Task<IActionResult> Details(int id)
     {
-        var item = await db.Events.AsNoTracking().Include(x => x.Registrations).FirstOrDefaultAsync(x => x.Id == id);
+        var userId = users.GetUserId(User);
+        var item = await db.Events.AsNoTracking().Where(x => x.Id == id)
+            .Select(x => new EventDetailsViewModel(x,
+                x.Registrations.Count(r => r.Status != ApplicationStatus.Rejected),
+                x.Registrations.Where(r => r.UserId == userId).Select(r => (ApplicationStatus?)r.Status).FirstOrDefault()))
+            .FirstOrDefaultAsync();
         return item is null ? NotFound() : View(item);
     }
 
@@ -39,11 +44,20 @@ public class EventsController(ApplicationDbContext db, UserManager<ApplicationUs
         var item = await db.Events.Include(x => x.Registrations).FirstOrDefaultAsync(x => x.Id == id);
         if (item is null) return NotFound();
         var userId = users.GetUserId(User)!;
-        if (item.StartsAt <= DateTime.UtcNow ||
-            item.Registrations.Count(x => x.Status != ApplicationStatus.Rejected) >= item.Capacity ||
-            item.Registrations.Any(x => x.UserId == userId))
+        var previous = item.Registrations.FirstOrDefault(x => x.UserId == userId);
+        if (previous is not null)
         {
-            TempData["Message"] = "Etkinliğe kayıt yapılamıyor: süre, kontenjan veya önceki başvurunuzu kontrol edin.";
+            TempData["Message"] = "Bu etkinliğe zaten başvurdunuz. Durum: " + previous.Status.Label() + ".";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        if (item.StartsAt <= DateTime.UtcNow)
+        {
+            TempData["Message"] = "Etkinlik başladığı için yeni başvuru alınmıyor.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        if (item.Registrations.Count(x => x.Status != ApplicationStatus.Rejected) >= item.Capacity)
+        {
+            TempData["Message"] = "Etkinliğin kontenjanı doldu.";
             return RedirectToAction(nameof(Details), new { id });
         }
         db.EventRegistrations.Add(new EventRegistration { EventId = id, UserId = userId });

@@ -8,6 +8,7 @@ ASP.NET Core MVC tabanlı topluluk, etkinlik ve Ar-Ge proje yönetimi uygulamas�
 - Takım, proje, etkinlik ve duyurular için liste/detay sayfaları ve arama. Takımlarda alan, projelerde takım/durum, etkinliklerde geçmiş/yaklaşan filtresi.
 - Kayıt, giriş, çıkış; `Admin` ve `Member` rolleri.
 - Takım ve etkinlik başvuruları; kullanıcıya ait başvuru durumlarını gösteren, ad/bölüm bilgilerinin düzenlenebildiği `/profile` ekranı.
+- Takım/etkinlik detaylarında kişisel başvuru durumu; mevcut başvuru varsa tekrar başvuru çağrısı yerine profil bağlantısı. Ziyaretçiler girişten sonra uygun detay veya form sayfasına döner.
 - Admin panelinde takım, proje, etkinlik ve duyuru CRUD; takım/etkinlik başvurularını onaylama, reddetme veya beklemeye alma.
 - Events ve Projects için JSON CRUD API; Development ortamında Swagger UI.
 - Ayarlanabilir GitHub REST API bağlantısı ile herkese açık depoların listelenmesi.
@@ -91,6 +92,20 @@ Uygulamayı ayrı bir **deneme veritabanıyla** çalıştırın; betikler veri o
 ```
 
 İlk betik mevcut kimlik, takım/proje, başvuru ve API akışlarını; ikinci betik yeni içerik yönetimi, profil sahipliği, kararlar, kontenjan, filtreler, geçersiz istekler ve yetki korumalarını sınar. Testler yoğun yük veya tüm güvenlik durumlarının kapsamlı değerlendirmesi değildir. Mobil kontrol için tarayıcıda 375/390 piksel genişlikte menü, filtreler, profil ve yönetim tablolarını inceleyin.
+
+### Otomatik geçici test ortamı
+
+Windows ve PowerShell 7'de, .NET SDK ve PostgreSQL araçları PATH'teyse aşağıdaki komut tüm yerel kabul akışını çalıştırır. Öncesinde projedeki paketleri `dotnet restore` ile indirmiş olun:
+
+```powershell
+./tests/Invoke-LocalAcceptance.ps1
+# Araçlar PATH'te değilse çalıştırılabilir dosya/klasör yollarını belirtin:
+./tests/Invoke-LocalAcceptance.ps1 -DotnetPath 'C:\path\to\dotnet.exe' -PostgresBin 'C:\Program Files\PostgreSQL\18\bin'
+```
+
+Bu yardımcı projeyi derler, `.localtest/acceptance-...` altında ayrı PostgreSQL kümesi oluşturur, yalnızca 127.0.0.1 üzerinde kullanılabilir portlarla uygulamayı açar, rastgele parolalı geçici Admin oluşturur ve iki betiği çalıştırır. Bitince uygulamayı ve test kümesini kapatır; yalnızca kendisinin oluşturduğu test klasörünü siler. Mevcut veritabanına bağlanmaz. Süreç için değiştirdiği ortam ayarlarını geri yükler. Hata incelemesi için `-KeepArtifacts` verilirse süreçler durdurulur ama loglar ve test kümesi dosyaları korunur. Çalışan gerçek uygulamanız aynı derleme çıktısını kullanıyorsa önce onu durdurun.
+
+PortalFlows; detay sayfalarında Pending/Approved/Rejected durumlarını, başvuru durumunun başka kullanıcıya gösterilmemesini, giriş dönüşünü ve karar sonrası yönetici filtresinin korunmasını da doğrular. Aynı etkinlikteki son yer için iki paralel istek göndererek tek aktif kayıt oluştuğunu kontrol eder.
 
 ## Kaynak haritası
 

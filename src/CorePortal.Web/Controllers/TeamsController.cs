@@ -27,7 +27,11 @@ public class TeamsController(ApplicationDbContext db, UserManager<ApplicationUse
     public async Task<IActionResult> Details(int id)
     {
         var team = await db.Teams.AsNoTracking().Include(x => x.Projects).FirstOrDefaultAsync(x => x.Id == id);
-        return team is null ? NotFound() : View(team);
+        if (team is null) return NotFound();
+        var userId = users.GetUserId(User);
+        var status = await db.TeamApplications.AsNoTracking().Where(x => x.TeamId == id && x.UserId == userId)
+            .Select(x => (ApplicationStatus?)x.Status).FirstOrDefaultAsync();
+        return View(new TeamDetailsViewModel(team, status));
     }
 
     [Authorize]
@@ -35,6 +39,12 @@ public class TeamsController(ApplicationDbContext db, UserManager<ApplicationUse
     {
         var team = await db.Teams.FindAsync(id);
         if (team is null) return NotFound();
+        var userId = users.GetUserId(User)!;
+        if (await db.TeamApplications.AnyAsync(x => x.TeamId == id && x.UserId == userId))
+        {
+            TempData["Message"] = "Bu takıma zaten başvurdunuz. Başvuru durumunuzu aşağıda görebilirsiniz.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
         ViewBag.Team = team;
         return View(new TeamApplicationForm());
     }

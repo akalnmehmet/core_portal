@@ -12,6 +12,7 @@
 @foreach (var item in Model.Events) {
 <tr><td>@item.User.FullName<br /><span class="small text-muted">@item.User.Email</span></td><td>@item.Event.Title</td><td>@item.AppliedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td><td>@item.Status.Label()</td><td>
 <form asp-action="EventStatus" asp-route-id="@item.Id" method="post" class="decision-form" data-application-id="@item.Id">
+<input type="hidden" name="filterStatus" value="@Model.Status" />
 <label for="event-status-@item.Id" class="visually-hidden">@item.User.FullName için başvuru kararı</label>
 <select id="event-status-@item.Id" name="status" class="form-select form-select-sm">
 @foreach (var status in Enum.GetValues<ApplicationStatus>()) { <option value="@status" selected="@(item.Status == status)">@status.Label()</option> }
@@ -28,6 +29,7 @@
 <p class="preserve-lines"><strong>Motivasyon:</strong> @item.Motivation</p>
 <p class="preserve-lines"><strong>Yetkinlikler:</strong> @item.Skills</p><p>Durum: @item.Status.Label()</p>
 <form asp-action="TeamStatus" asp-route-id="@item.Id" method="post" class="decision-form" data-application-id="@item.Id">
+<input type="hidden" name="filterStatus" value="@Model.Status" />
 <label for="team-status-@item.Id" class="visually-hidden">@item.User.FullName için başvuru kararı</label>
 <select id="team-status-@item.Id" name="status" class="form-select form-select-sm">
 @foreach (var status in Enum.GetValues<ApplicationStatus>()) { <option value="@status" selected="@(item.Status == status)">@status.Label()</option> }

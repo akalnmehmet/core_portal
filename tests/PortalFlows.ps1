@@ -77,6 +77,17 @@ Assert (([DateTime]$apiEvent.startsAt).ToUniversalTime() -eq $expectedUtc) 'Loca
 $invalidEvent = Send-Form '/admin/events/create' @{ Title = 'Invalid'; Description = 'Missing date'; Location = 'Campus'; Capacity = '0' } $admin
 Assert ($invalidEvent.Content.Contains('validation-summary-errors')) 'Event validation missing'
 
+# Anonymous users must go through a GET login return, not return to a POST-only action.
+$visitor = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$visitorDetails = Read-Page "/Events/Details/$eventId" $visitor
+Assert (!$visitorDetails.Content.Contains("action=`"/Events/Register/$eventId`"")) 'Anonymous event detail displayed a POST application form'
+$loginLink = [regex]::Match($visitorDetails.Content, 'href="(/account/login\?returnUrl=[^"]+)"').Groups[1].Value
+Assert (![string]::IsNullOrEmpty($loginLink)) 'Anonymous event detail has no login return link'
+$loginLink = [System.Net.WebUtility]::HtmlDecode($loginLink)
+$loginReturn = Send-Form $loginLink @{ Email = "flow-one-$suffix@example.test"; Password = 'FlowTest!23456' } $visitor
+Assert ($loginReturn.BaseResponse.RequestMessage.RequestUri.AbsolutePath -eq "/Events/Details/$eventId") 'Login did not return to event details'
+Assert ($loginReturn.Content.Contains("action=`"/Events/Register/$eventId`"")) 'Authenticated applicant did not see the application form'
+
 # Team and project filters are combined, not applied independently.
 $teamName = "Flow Team $suffix"
 $teamCreated = Send-Form '/admin/teams/create' @{ Name = $teamName; Field = "FlowField$suffix"; FoundedYear = '2026'; Description = 'Research team.' } $admin
@@ -108,6 +119,16 @@ Assert ($invalidProfile.Content.Contains('validation-summary-errors')) 'Profile 
 # Applications and administrator decisions.
 $null = Send-Form "/Teams/Apply/$teamId" @{ Motivation = 'I want to contribute to this research team.'; Skills = 'C sharp and testing' } $member
 $null = Send-Form "/Events/Register/$eventId" @{} $member "/Events/Details/$eventId"
+$pendingEvent = Read-Page "/Events/Details/$eventId" $member
+Assert ($pendingEvent.Content.Contains('data-application-status="Pending"')) 'Pending event status not shown on detail'
+Assert (!$pendingEvent.Content.Contains("action=`"/Events/Register/$eventId`"")) 'Existing applicant still sees an event application form'
+$pendingTeam = Read-Page "/Teams/Details/$teamId" $member
+Assert ($pendingTeam.Content.Contains('data-application-status="Pending"')) 'Pending team status not shown on detail'
+$repeatForm = Read-Page "/Teams/Apply/$teamId" $member
+Assert ($repeatForm.BaseResponse.RequestMessage.RequestUri.AbsolutePath -eq "/Teams/Details/$teamId") 'Repeat team application still opens an empty form'
+$otherDetails = Read-Page "/Events/Details/$eventId" $other
+Assert (!$otherDetails.Content.Contains('data-application-status=')) 'Application state leaked to another user'
+Assert ([System.Net.WebUtility]::HtmlDecode($otherDetails.Content).Contains('kontenjanı doldu')) 'Full event message missing'
 $applications = Read-Page '/admin/applications' $admin
 $eventApplicationId = Row-Id $applications "flow-one-$suffix@example.test" '/admin/applications/events/(\d+)/status'
 $teamCard = [regex]::Matches($applications.Content, '(?s)<article.*?</article>') | Where-Object { $_.Value.Contains($teamName) } | Select-Object -First 1
@@ -116,9 +137,14 @@ $teamApplicationId = $teamForm.Groups[1].Value
 Assert (![string]::IsNullOrEmpty($teamApplicationId)) 'Team application decision form missing'
 foreach ($kind in @('events', 'teams')) {
     $id = if ($kind -eq 'events') { $eventApplicationId } else { $teamApplicationId }
-    $decision = Send-Form "/admin/applications/$kind/$id/status" @{ status = 'Approved' } $admin '/admin/applications'
+    $decision = Send-Form "/admin/applications/$kind/$id/status" @{ status = 'Approved'; filterStatus = 'Pending' } $admin '/admin/applications?status=Pending'
     Assert ($decision.StatusCode -eq 200) "Approval failed: $kind"
+    Assert ($decision.BaseResponse.RequestMessage.RequestUri.Query.Contains('status=Pending')) "Application filter lost after decision: $kind"
 }
+$approvedEvent = Read-Page "/Events/Details/$eventId" $member
+Assert ($approvedEvent.Content.Contains('data-application-status="Approved"')) 'Approved event status not reflected on detail'
+$approvedTeam = Read-Page "/Teams/Details/$teamId" $member
+Assert ($approvedTeam.Content.Contains('data-application-status="Approved"')) 'Approved team status not reflected on detail'
 $profile = Read-Page '/profile' $member
 $decodedProfile = [System.Net.WebUtility]::HtmlDecode($profile.Content)
 Assert ([regex]::Matches($decodedProfile, 'Onaylandı').Count -eq 2) 'Approved decisions did not reach profile'
@@ -129,6 +155,9 @@ Assert (!$filtered.Content.Contains($eventTitle)) 'Application status filter ign
 
 # A rejected application frees a place; re-approval must not overflow a full event.
 $null = Send-Form "/admin/applications/events/$eventApplicationId/status" @{ status = 'Rejected' } $admin '/admin/applications'
+$rejectedDetails = Read-Page "/Events/Details/$eventId" $member
+Assert ($rejectedDetails.Content.Contains('data-application-status="Rejected"')) 'Rejected event status not reflected on detail'
+Assert (!$rejectedDetails.Content.Contains("action=`"/Events/Register/$eventId`"")) 'Rejected applicant was offered a duplicate event registration'
 $null = Send-Form "/Events/Register/$eventId" @{} $other "/Events/Details/$eventId"
 $blocked = Send-Form "/admin/applications/events/$eventApplicationId/status" @{ status = 'Approved' } $admin '/admin/applications'
 Assert ([System.Net.WebUtility]::HtmlDecode($blocked.Content).Contains('Etkinlik dolu')) 'Re-approval bypassed capacity'
@@ -193,4 +222,4 @@ $deleted = Invoke-WebRequest "$BaseUrl/api/events/$eventId" -SkipHttpErrorCheck
 Assert ($deleted.StatusCode -eq 404) 'Event delete failed'
 $profile = Read-Page '/profile' $member
 Assert (!$profile.Content.Contains($eventTitle)) 'Deleted event remained in profile'
-Write-Output "PASS content CRUD, validation, encoding, filters, profile ownership, approvals, capacity, concurrent registration, authorization, antiforgery ($suffix)"
+Write-Output "PASS content CRUD, validation, encoding, filters, profile ownership, detail states, login return, approvals, preserved admin filters, capacity, concurrent registration, authorization, antiforgery ($suffix)"

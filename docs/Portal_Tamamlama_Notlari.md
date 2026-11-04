@@ -22,6 +22,12 @@ Başvuru durumları veritabanındaki mevcut enum alanıyla yönetiliyor; şema d
 
 Chrome'da 390 piksel görünümde ana sayfa, mobil menü ve kullanıcı profili; masaüstünde proje filtreleri görsel olarak incelendi. Menü genişleme eşiği, orta ekranlarda gezinme bağlantılarının sıkışmasını önlemek için lg seviyesine alındı. Bu doğrulama bütün cihazları veya kapsamlı yük/güvenlik testini kapsamaz. Test verileri gerçek uygulama verisinden ayrı tutuldu.
 
+## Gösterim öncesi akış düzeltmeleri
+
+Takım ve etkinlik detay sayfaları artık oturumdaki kullanıcının başvuru durumunu gösteriyor. Var olan başvuru için tekrar başvuru çağrısı çıkmıyor; profil bağlantısı sunuluyor. Başka kullanıcıya aynı durum gösterilmiyor. Takım başvuru formunu tekrar açmak mevcut başvuruya ait detay sayfasına yönlendiriyor. Etkinlikte başlamış olma, doluluk ve önceki başvuru için ayrı mesajlar var. Ziyaretçinin etkinlik başvurusu giriş sonrası POST adresine değil GET detayına dönüyor. Proje detayından ilgili takıma geçiş ve çok satırlı açıklama gösterimi eklendi. Yönetici kararları sonrasında seçili durum filtresi korunuyor.
+
+`tests/Invoke-LocalAcceptance.ps1` Windows/PowerShell 7 için tekrarlanabilir, mevcut veritabanından bağımsız bir doğrulama ortamı açıp kapatıyor. 4 Kasım 2026 tarihinde bu yardımcıyla .NET 10.0.402 üzerinde 0 derleme hatası, Smoke PASS, genişletilmiş PortalFlows PASS ve geçici PostgreSQL kümesi temizliği doğrulandı. NU1900 ağ erişimi uyarısı devam etti. Bu ek tur HTTP/Razor çıktıları ve veritabanı akışları üzerinden doğrulandı; bu turda yeni bir Chrome görsel kontrolü yapılmadı.
+
 ## Ders teslimine kalan dış işler
 
 Gerçek içeriklerin ve topluluk bilgilerinin gözden geçirilmesi; GitHub görünürlüğü/collaborator erişimi, gerçek Drive bağlantısı, haftalık videolar ve sınıf gösterimi kullanıcı hesabı ve ders süreci üzerinden yürütülür. Yerel kod tamamlanması bu teslimlerin yapıldığını göstermez.

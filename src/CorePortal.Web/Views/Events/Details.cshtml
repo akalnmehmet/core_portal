@@ -1,8 +1,21 @@
-@model Event
-@{ ViewData["Title"] = Model.Title; var occupied = Model.Registrations.Count(x => x.Status != ApplicationStatus.Rejected); }
-<h1>@Model.Title</h1>
-<p class="text-muted">@Model.StartsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @Model.Location</p>
-<p>@Model.Description</p><p>Kontenjan: @occupied / @Model.Capacity</p>
-@if (Model.StartsAt > DateTime.UtcNow && occupied < Model.Capacity) {
-    <form asp-action="Register" asp-route-id="@Model.Id" method="post"><button class="btn btn-primary">Etkinliğe başvur</button></form>
-} else { <p class="text-muted">Başvuru kapalı.</p> }
+@model EventDetailsViewModel
+@{ ViewData["Title"] = Model.Event.Title; }
+<a asp-action="Index" class="d-inline-block mb-3">Etkinliklere dön</a>
+<h1>@Model.Event.Title</h1>
+<p class="text-muted">@Model.Event.StartsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @Model.Event.Location</p>
+<p class="preserve-lines">@Model.Event.Description</p>
+<p>Kontenjan: @Model.Occupied / @Model.Event.Capacity</p>
+@if (Model.Status.HasValue) {
+    <div class="alert alert-secondary" role="status" data-application-status="@Model.Status">
+        Başvuru durumunuz: <strong>@Model.Status.Value.Label()</strong>.
+        <a asp-controller="Profile" asp-action="Index">Başvurularımı görüntüle</a>
+    </div>
+} else if (Model.Event.StartsAt <= DateTime.UtcNow) {
+    <p class="text-muted">Etkinlik başladığı için yeni başvuru alınmıyor.</p>
+} else if (Model.Occupied >= Model.Event.Capacity) {
+    <p class="text-muted">Etkinliğin kontenjanı doldu.</p>
+} else if (User.Identity?.IsAuthenticated == true) {
+    <form asp-action="Register" asp-route-id="@Model.Event.Id" method="post"><button class="btn btn-primary">Etkinliğe başvur</button></form>
+} else {
+    <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Events", new { id = Model.Event.Id })" class="btn btn-primary">Başvurmak için giriş yap</a>
+}
